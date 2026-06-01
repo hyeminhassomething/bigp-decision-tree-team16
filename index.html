@@ -251,6 +251,90 @@
     50% { transform: translateX(8px); opacity: 1; }
   }
 
+  /* ---------- Section 2: data preview table ---------- */
+  .data-preview {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 16px 12px;
+    margin-bottom: 14px;
+  }
+  .data-preview .dp-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .data-preview .dp-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: -0.01em;
+  }
+  .data-preview .dp-more {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-family: monospace;
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-family: monospace;
+  }
+  .data-table thead th {
+    text-align: left;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 5px 9px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  .data-table thead th:first-child { border-top-left-radius: 6px; }
+  .data-table thead th:last-child {
+    border-top-right-radius: 6px;
+    color: var(--muted);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .data-table tbody td {
+    padding: 5px 9px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .data-table tbody tr:last-child td { border-bottom: 0; }
+  .data-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+  .data-table .lab {
+    font-weight: 800;
+    font-size: 12.5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    display: inline-block;
+    font-family: -apple-system, "Apple SD Gothic Neo", sans-serif;
+  }
+  .data-table .lab.e {
+    color: var(--teal);
+    background: var(--teal-soft);
+    border: 1px solid var(--teal);
+  }
+  .data-table .lab.p {
+    color: var(--coral);
+    background: var(--coral-soft);
+    border: 1px solid var(--coral);
+  }
+  .data-table .code { color: var(--yellow); font-weight: 700; }
+  .data-table .ko { color: var(--muted); font-size: 12px; margin-left: 2px; }
+  .data-table .ellipsis {
+    color: var(--muted);
+    font-style: italic;
+    text-align: center;
+  }
+
   /* ---------- Section 3: Tree ---------- */
   .tree-wrap {
     display: grid;
@@ -889,6 +973,69 @@
   <div class="section-num">SECTION 02 · MOTIVATION</div>
   <h2 class="section-title">왜 의사결정트리인가?</h2>
   <p class="section-sub">데이터 8,124개 × 특징 22개 — 사람이 손으로 규칙을 짜는 건 불가능합니다.</p>
+
+  <div class="data-preview">
+    <div class="dp-head">
+      <span class="dp-title">📋 실제 데이터는 이렇게 생겼습니다 — 버섯 4개 미리보기</span>
+      <span class="dp-more">… 외 16개 특징 / 총 22개 컬럼</span>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>label</th>
+          <th>odor<br><span style="font-weight:400;text-transform:none;color:var(--muted);font-size:10.5px;">냄새</span></th>
+          <th>cap-color<br><span style="font-weight:400;text-transform:none;color:var(--muted);font-size:10.5px;">갓 색</span></th>
+          <th>cap-shape<br><span style="font-weight:400;text-transform:none;color:var(--muted);font-size:10.5px;">갓 모양</span></th>
+          <th>gill-size<br><span style="font-weight:400;text-transform:none;color:var(--muted);font-size:10.5px;">주름 크기</span></th>
+          <th>spore-print<br><span style="font-weight:400;text-transform:none;color:var(--muted);font-size:10.5px;">포자색</span></th>
+          <th>habitat<br><span style="font-weight:400;text-transform:none;color:var(--muted);font-size:10.5px;">서식지</span></th>
+          <th>…</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="lab p">독성 p</span></td>
+          <td><span class="code">p</span><span class="ko">(자극적)</span></td>
+          <td><span class="code">n</span><span class="ko">(갈색)</span></td>
+          <td><span class="code">x</span><span class="ko">(볼록)</span></td>
+          <td><span class="code">n</span><span class="ko">(좁음)</span></td>
+          <td><span class="code">k</span><span class="ko">(검정)</span></td>
+          <td><span class="code">u</span><span class="ko">(도시)</span></td>
+          <td class="ellipsis">…</td>
+        </tr>
+        <tr>
+          <td><span class="lab e">식용 e</span></td>
+          <td><span class="code">a</span><span class="ko">(아몬드)</span></td>
+          <td><span class="code">y</span><span class="ko">(노랑)</span></td>
+          <td><span class="code">x</span><span class="ko">(볼록)</span></td>
+          <td><span class="code">b</span><span class="ko">(넓음)</span></td>
+          <td><span class="code">n</span><span class="ko">(갈색)</span></td>
+          <td><span class="code">g</span><span class="ko">(잔디)</span></td>
+          <td class="ellipsis">…</td>
+        </tr>
+        <tr>
+          <td><span class="lab e">식용 e</span></td>
+          <td><span class="code">l</span><span class="ko">(아니스)</span></td>
+          <td><span class="code">w</span><span class="ko">(흰색)</span></td>
+          <td><span class="code">b</span><span class="ko">(종모양)</span></td>
+          <td><span class="code">b</span><span class="ko">(넓음)</span></td>
+          <td><span class="code">n</span><span class="ko">(갈색)</span></td>
+          <td><span class="code">m</span><span class="ko">(초원)</span></td>
+          <td class="ellipsis">…</td>
+        </tr>
+        <tr>
+          <td><span class="lab p">독성 p</span></td>
+          <td><span class="code">p</span><span class="ko">(자극적)</span></td>
+          <td><span class="code">w</span><span class="ko">(흰색)</span></td>
+          <td><span class="code">x</span><span class="ko">(볼록)</span></td>
+          <td><span class="code">n</span><span class="ko">(좁음)</span></td>
+          <td><span class="code">r</span><span class="ko">(초록)</span></td>
+          <td><span class="code">u</span><span class="ko">(도시)</span></td>
+          <td class="ellipsis">…</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <div class="compare">
     <div class="compare-card left">
