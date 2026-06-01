@@ -712,23 +712,28 @@
   .baseline-row.strong .bl-label { color: var(--teal); font-weight: 700; }
   .baseline-row .bl-bar {
     flex: 1;
-    height: 12px;
-    background: var(--bg);
+    height: 14px;
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--border);
     border-radius: 999px;
     overflow: hidden;
     position: relative;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.25);
   }
   .baseline-row .bl-bar .fill {
+    display: block;
     height: 100%;
     border-radius: 999px;
     transition: width 0.5s ease-out;
+    min-width: 4px;
   }
   .baseline-row.weak .fill {
-    background: linear-gradient(90deg, rgba(251,113,133,0.5), var(--coral));
+    background: linear-gradient(90deg, #fb7185, #f43f5e);
+    box-shadow: 0 0 8px rgba(251, 113, 133, 0.55);
   }
   .baseline-row.strong .fill {
-    background: linear-gradient(90deg, var(--teal), #5eead4);
+    background: linear-gradient(90deg, #2dd4bf, #5eead4);
+    box-shadow: 0 0 10px rgba(45, 212, 191, 0.6);
   }
   .baseline-row .bl-val {
     flex: 0 0 56px;
