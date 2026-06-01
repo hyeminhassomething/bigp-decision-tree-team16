@@ -517,6 +517,83 @@
   .mini-stat.teal .num { color: var(--teal); }
   .mini-stat.coral .num { color: var(--coral); }
 
+  /* Highlighted "직접 구현" feature card */
+  .feat-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .feat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--yellow);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .feat-card .feat-num {
+    font-family: monospace;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--yellow);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .feat-card .feat-body { display: flex; flex-direction: column; min-width: 0; }
+  .feat-card .feat-title {
+    font-size: 12px;
+    color: var(--yellow);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+  }
+  .feat-card .feat-desc {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.45;
+  }
+  .feat-card .feat-sub {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .feat-card.tag {
+    border-left-color: var(--teal);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    justify-content: center;
+  }
+  .feat-card.tag .feat-title { color: var(--teal); }
+  .feat-card.tag .pill {
+    background: var(--teal-soft);
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    align-self: flex-start;
+  }
+  .feat-card.tag .feat-desc { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+  /* best_split timing caption */
+  .cc-cap {
+    font-family: -apple-system, sans-serif;
+    font-size: 10.5px;
+    color: var(--yellow);
+    margin-top: 6px;
+    padding-top: 5px;
+    border-top: 1px dashed var(--border);
+    line-height: 1.45;
+  }
+  .cc-cap .ic { font-size: 11px; margin-right: 3px; }
+
   .result-row {
     display: grid;
     grid-template-columns: 1.4fr 1fr;
@@ -763,6 +840,7 @@
     section { padding: 50px 32px; }
     .cover-title { font-size: 56px; }
     .wrap-grid { grid-template-columns: repeat(2, 1fr); }
+    .feat-row { grid-template-columns: 1fr; }
     .limit-cards, .impl-grid, .gini-grid, .result-row, .tree-wrap, .compare {
       grid-template-columns: 1fr;
     }
@@ -1119,6 +1197,7 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
 <span class="cl glow" data-line="b6">        <span class="kw">if</span> gain > best:</span>      <span class="ann">↗ 노드의 질문 텍스트</span>
 <span class="cl glow" data-line="b7">            best = (f, v)</span>      <span class="ann">↗ 루트엔 odor=="n" 선택</span>
 <span class="cl" data-line="b8">    <span class="kw">return</span> best</span></pre>
+      <div class="cc-cap"><span class="ic">⚡</span>완전탐색이지만 <code>set</code> 으로 중복 값 제거 → 8,124개 1초 미만</div>
     </div>
 
     <!-- Card 3: build_tree() — middle-left, between branches -->
@@ -1170,6 +1249,29 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
     <div class="mini-stat"><div class="num">22</div><div class="label">특징 (범주형)</div></div>
     <div class="mini-stat teal"><div class="num">51.8%</div><div class="label">식용 (e)</div></div>
     <div class="mini-stat coral"><div class="num">48.2%</div><div class="label">독성 (p)</div></div>
+  </div>
+
+  <div class="feat-row">
+    <div class="feat-card">
+      <div class="feat-num">7 : 3</div>
+      <div class="feat-body">
+        <div class="feat-title">TRAIN / TEST 분리 · 직접 구현</div>
+        <div class="feat-desc"><code>i % 10</code> 으로 직접 분리 — <strong style="color:var(--text)">라이브러리 없이, 재현 가능</strong></div>
+        <div class="feat-sub">train 정확도와 test 정확도를 따로 측정 (오른쪽 차트 참고)</div>
+      </div>
+    </div>
+
+    <div class="feat-card tag">
+      <div class="feat-title">🔤 인코딩 없음</div>
+      <span class="pill">odor == "n"</span>
+      <div class="feat-desc">문자를 숫자로 바꾸지 않고 <strong style="color:var(--text)">문자 그대로 == 비교</strong></div>
+    </div>
+
+    <div class="feat-card tag">
+      <div class="feat-title">⚡ 계산 시간</div>
+      <span class="pill">&lt; 1초</span>
+      <div class="feat-desc">완전탐색이지만 <code>set</code> 으로 중복 값 제거 → <strong style="color:var(--text)">8,124개 1초 미만</strong></div>
+    </div>
   </div>
 
   <div class="result-row">
