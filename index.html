@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>의사결정트리 — 16조 발표</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<style>
+  :root {
+    --bg: #0a0f1d;
+    --bg2: #111a2e;
+    --panel: #15203a;
+    --panel-2: #1b2747;
+    --border: #25324f;
+    --text: #e6ecf5;
+    --muted: #8b9bb8;
+    --teal: #2dd4bf;
+    --coral: #fb7185;
+    --teal-soft: rgba(45, 212, 191, 0.15);
+    --coral-soft: rgba(251, 113, 133, 0.15);
+    --yellow: #fbbf24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+  code, pre, .mono { font-family: "SF Mono", "JetBrains Mono", "Menlo", "Consolas", monospace; }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 240px;
+    height: 100vh;
+    background: linear-gradient(180deg, #0d1428, #0a0f1d);
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    overflow-y: auto;
+    z-index: 100;
+  }
+  .brand {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .brand small {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .nav-group { margin-top: 28px; }
+  .nav-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-left: 12px;
+  }
+  .nav-item {
+    display: block;
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    border-radius: 8px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: var(--panel); color: var(--text); }
+  .nav-item.active {
+    background: var(--panel-2);
+    color: var(--teal);
+    border-left-color: var(--teal);
+    font-weight: 600;
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar {
+    position: fixed;
+    top: 16px; right: 24px;
+    background: rgba(21, 32, 58, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--muted);
+    z-index: 100;
+  }
+  .topbar .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ---------- Sections ---------- */
+  main {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
+  section {
+    min-height: 100vh;
+    padding: 80px 80px 60px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: "SF Mono", monospace;
+    font-size: 13px;
+    color: var(--teal);
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    line-height: 1.15;
+  }
+  .section-sub {
+    font-size: 20px;
+    color: var(--muted);
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
+  .time-hint {
+    position: absolute;
+    bottom: 24px;
+    right: 32px;
+    font-size: 12px;
+    color: var(--muted);
+    opacity: 0.5;
+    font-family: monospace;
+  }
+
+  /* ---------- Section 1: Cover ---------- */
+  #sec1 {
+    background: radial-gradient(ellipse at 30% 50%, rgba(45, 212, 191, 0.08), transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(251, 113, 133, 0.06), transparent 60%),
+                var(--bg);
+  }
+  .cover-title {
+    font-size: 88px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--teal), #5eead4 60%, #fff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 24px;
+  }
+  .cover-subtitle {
+    font-size: 32px;
+    color: var(--text);
+    font-weight: 300;
+    margin-bottom: 60px;
+    letter-spacing: -0.01em;
+  }
+  .cover-subtitle .accent { color: var(--teal); font-weight: 600; }
+  .cover-meta {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+  .cover-meta .team {
+    color: var(--text);
+    font-weight: 600;
+    margin-right: 12px;
+  }
+  .cover-badge {
+    display: inline-block;
+    margin-top: 32px;
+    padding: 10px 18px;
+    background: var(--teal-soft);
+    border: 1px solid var(--teal);
+    border-radius: 999px;
+    color: var(--teal);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* ---------- Section 2: Motivation ---------- */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    gap: 24px;
+    align-items: stretch;
+    margin-top: 20px;
+  }
+  .compare-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+  }
+  .compare-card.left { border-color: var(--coral); }
+  .compare-card.right { border-color: var(--teal); }
+  .compare-card h3 {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+  .compare-card.left h3 { color: var(--coral); }
+  .compare-card.right h3 { color: var(--teal); }
+  .compare-card pre {
+    background: #0a0f1d;
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin: 16px 0;
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+  .compare-card .note {
+    color: var(--muted);
+    font-size: 15px;
+    margin-top: 12px;
+  }
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: var(--teal);
+    font-weight: 100;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: translateX(0); opacity: 0.7; }
+    50% { transform: translateX(8px); opacity: 1; }
+  }
+
+  /* ---------- Section 3: Tree ---------- */
+  .tree-wrap {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .tree-svg-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+  }
+  .tree-svg-wrap svg { width: 100%; height: auto; }
+  .tree-node {
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .tree-node:hover { transform: scale(1.05); transform-origin: center; }
+  .tree-node rect, .tree-node circle { transition: filter 0.2s; }
+  .tree-node:hover rect, .tree-node:hover circle {
+    filter: brightness(1.2) drop-shadow(0 0 8px currentColor);
+  }
+  #tree-tooltip {
+    position: absolute;
+    background: #0a0f1d;
+    border: 1px solid var(--teal);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    max-width: 240px;
+    z-index: 10;
+  }
+  .tree-points {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .tree-point {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    padding: 18px 22px;
+    border-radius: 10px;
+  }
+  .tree-point .num {
+    color: var(--teal);
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 4px;
+    letter-spacing: 0.1em;
+  }
+  .tree-point .body { font-size: 17px; }
+
+  /* ---------- Section 4: Gini ---------- */
+  .gini-formula {
+    font-size: 22px;
+    text-align: center;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 18px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+  }
+  .gini-formula .label { color: var(--muted); margin-right: 12px; }
+  .gini-formula code { color: var(--teal); font-size: 26px; }
+  .gini-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 32px;
+    align-items: stretch;
+  }
+  .gini-controls {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .gini-counter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .gini-counter .label {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .gini-counter.edible .label { color: var(--teal); }
+  .gini-counter.poison .label { color: var(--coral); }
+  .gini-counter .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .gini-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .gini-btn:hover { background: var(--teal); color: var(--bg); border-color: var(--teal); }
+  .gini-btn:active { transform: scale(0.95); }
+  .gini-count {
+    font-family: monospace;
+    font-size: 28px;
+    font-weight: 700;
+    min-width: 60px;
+    text-align: center;
+  }
+  .gini-counter.edible .gini-count { color: var(--teal); }
+  .gini-counter.poison .gini-count { color: var(--coral); }
+  .gini-display {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .gini-value {
+    font-family: monospace;
+    font-size: 88px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .gini-label {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .gini-gauge {
+    width: 100%;
+    height: 16px;
+    background: var(--bg);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .gini-gauge-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--yellow), var(--coral));
+    transition: width 0.3s ease-out;
+  }
+  .gini-gauge-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: monospace;
+  }
+  .gini-breakdown {
+    margin-top: 20px;
+    font-family: monospace;
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.8;
+  }
+  .gini-breakdown .calc-teal { color: var(--teal); }
+  .gini-breakdown .calc-coral { color: var(--coral); }
+  .best-split {
+    margin-top: 32px;
+    background: var(--panel-2);
+    border-left: 4px solid var(--yellow);
+    padding: 18px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+  .best-split strong { color: var(--yellow); }
+
+  /* ---------- Section 5: Code ---------- */
+  .funcs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .func-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    border-radius: 12px;
+    transition: transform 0.2s;
+  }
+  .func-card:hover { transform: translateY(-4px); border-color: var(--teal); }
+  .func-card .name {
+    font-family: monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 6px;
+  }
+  .func-card .desc { font-size: 14px; color: var(--muted); }
+  .code-block {
+    background: #060914;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block .kw { color: #c084fc; }
+  .code-block .fn { color: var(--teal); }
+  .code-block .str { color: #fbbf24; }
+  .code-block .com { color: #64748b; font-style: italic; }
+  .code-block .num { color: var(--coral); }
+  .import-badge {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 18px;
+    background: var(--teal-soft);
+    border: 1px solid var(--teal);
+    border-radius: 999px;
+    color: var(--teal);
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* ---------- Section 6: Data ---------- */
+  .data-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .big-stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+  }
+  .big-stat .num {
+    font-family: monospace;
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .big-stat .label {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .big-stat.teal .num { color: var(--teal); }
+  .big-stat.coral .num { color: var(--coral); }
+  .data-bottom {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+  .data-notes {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .data-notes li {
+    list-style: none;
+    padding: 8px 0;
+    font-size: 16px;
+  }
+  .data-notes li::before {
+    content: "✓ ";
+    color: var(--teal);
+    font-weight: 700;
+    margin-right: 8px;
+  }
+  .donut-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    height: 240px;
+    position: relative;
+  }
+
+  /* ---------- Section 7: Results ---------- */
+  .results-hero {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    padding: 24px 28px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    font-size: 22px;
+  }
+  .results-hero strong { color: var(--teal); }
+  .results-hero .gain-num {
+    font-family: monospace;
+    color: var(--yellow);
+    font-weight: 700;
+  }
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .chart-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    height: 360px;
+  }
+  .tree-mini {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.85;
+  }
+  .tree-mini .head {
+    font-family: -apple-system, sans-serif;
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .tree-mini .q { color: var(--yellow); }
+  .tree-mini .e { color: var(--teal); font-weight: 700; }
+  .tree-mini .p { color: var(--coral); font-weight: 700; }
+  .tree-mini .arr { color: var(--muted); }
+
+  /* ---------- Section 8: Limits ---------- */
+  .overfit-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--yellow);
+    padding: 24px 28px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    font-size: 16px;
+    line-height: 1.75;
+  }
+  .overfit-box .title {
+    color: var(--yellow);
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .limit-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .limit-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--coral);
+    padding: 22px;
+    border-radius: 12px;
+  }
+  .limit-card .head {
+    font-weight: 700;
+    color: var(--coral);
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  .limit-card .body {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .closing {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text);
+    padding: 32px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(90deg, transparent, var(--teal-soft), transparent);
+    letter-spacing: -0.01em;
+  }
+  .closing .ac { color: var(--teal); font-weight: 600; }
+
+  /* ---------- Responsive (basic) ---------- */
+  @media (max-width: 1100px) {
+    .sidebar { width: 200px; }
+    main { margin-left: 200px; width: calc(100% - 200px); }
+    section { padding: 60px 40px; }
+    .cover-title { font-size: 64px; }
+    .data-grid, .limit-cards, .funcs { grid-template-columns: repeat(2, 1fr); }
+    .gini-grid, .results-grid, .tree-wrap, .data-bottom, .compare { grid-template-columns: 1fr; }
+    .compare .arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">의사결정트리<small>16조 · 빅프1</small></div>
+
+  <div class="nav-group">
+    <div class="nav-label">전반부 ①~④</div>
+    <a class="nav-item active" data-target="sec1">① 표지</a>
+    <a class="nav-item" data-target="sec2">② 왜 필요한가</a>
+    <a class="nav-item" data-target="sec3">③ 트리 원리</a>
+    <a class="nav-item" data-target="sec4">④ Gini 불순도</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">후반부 ⑤~⑧</div>
+    <a class="nav-item" data-target="sec5">⑤ 코드 구현</a>
+    <a class="nav-item" data-target="sec6">⑥ 데이터</a>
+    <a class="nav-item" data-target="sec7">⑦ 결과</a>
+    <a class="nav-item" data-target="sec8">⑧ 한계 · 정리</a>
+  </div>
+</aside>
+
+<header class="topbar"><span class="dot"></span>16조 · 의사결정트리</header>
+
+<main>
+
+<!-- ① COVER -->
+<section id="sec1" data-section="1">
+  <h1 class="cover-title">의사결정트리<br><span style="font-size: 56px; color: var(--muted); font-weight: 300;">Decision Tree</span></h1>
+  <p class="cover-subtitle">사람의 <span class="accent">if문</span>을 데이터가 스스로 만든다</p>
+  <div class="cover-meta">
+    <span class="team">빅데이터프로그래밍1 · 16조</span><br>
+    정혜민 · 허원재 · 이승안 · 이재우
+  </div>
+  <span class="cover-badge">순수 파이썬만으로 직접 구현 · numpy·pandas·sklearn 0개</span>
+  <span class="time-hint">⏱ 20s</span>
+</section>
+
+<!-- ② MOTIVATION -->
+<section id="sec2" data-section="2">
+  <div class="section-num">SECTION 02 · MOTIVATION</div>
+  <h2 class="section-title">왜 의사결정트리인가?</h2>
+  <p class="section-sub">데이터 8,124개 × 특징 22개 — 사람이 손으로 규칙을 짜는 건 불가능합니다.</p>
+
+  <div class="compare">
+    <div class="compare-card left">
+      <h3>🙈 사람이 직접 if문</h3>
+      <pre><span class="com"># 손코딩…</span>
+<span style="color:#c084fc">if</span> odor == <span style="color:#fbbf24">"n"</span>:
+    <span style="color:#c084fc">if</span> spore == <span style="color:#fbbf24">"r"</span>:
+        <span style="color:#c084fc">return</span> <span style="color:#fb7185">"독성"</span>
+    <span style="color:#c084fc">else</span>:
+        <span style="color:#c084fc">return</span> <span style="color:#2dd4bf">"식용"</span>
+<span style="color:#c084fc">else</span>:
+    <span class="com"># 22개 특징 × 8124개 샘플…</span>
+    <span class="com"># 끝이 없다 💀</span></pre>
+      <p class="note">어떤 특징을, 어떤 순서로 물을지 — 전부 사람이 결정해야 함.</p>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <div class="compare-card right">
+      <h3>🤖 데이터가 만든 if문</h3>
+      <pre><span class="com"># 알고리즘이 자동 학습</span>
+tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
+<span style="color:#c084fc">return</span> <span style="color:#2dd4bf">predict</span>(tree, sample)
+
+<span class="com"># 뒤에서 알고리즘이…</span>
+<span class="com"># "어떤 질문이 가장</span>
+<span class="com">#  깔끔하게 가르나?"</span>
+<span class="com"># 를 반복적으로 묻는다</span></pre>
+      <p class="note">데이터가 스스로 <strong style="color:var(--teal)">가장 좋은 질문</strong>의 순서를 찾는다.</p>
+    </div>
+  </div>
+  <span class="time-hint">⏱ 40s</span>
+</section>
+
+<!-- ③ TREE PRINCIPLE -->
+<section id="sec3" data-section="3">
+  <div class="section-num">SECTION 03 · PRINCIPLE</div>
+  <h2 class="section-title">트리 = 분기 + 재귀</h2>
+  <p class="section-sub">노드에 마우스를 올려보세요 — 분기 노드와 잎 노드의 차이가 핵심입니다.</p>
+
+  <div class="tree-wrap">
+    <div class="tree-svg-wrap">
+      <svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg">
+        <!-- edges -->
+        <line x1="350" y1="55" x2="180" y2="155" stroke="#25324f" stroke-width="2"/>
+        <line x1="350" y1="55" x2="520" y2="155" stroke="#25324f" stroke-width="2"/>
+        <line x1="180" y1="195" x2="100" y2="285" stroke="#25324f" stroke-width="2"/>
+        <line x1="180" y1="195" x2="260" y2="285" stroke="#25324f" stroke-width="2"/>
+        <line x1="520" y1="195" x2="440" y2="285" stroke="#25324f" stroke-width="2"/>
+        <line x1="520" y1="195" x2="600" y2="285" stroke="#25324f" stroke-width="2"/>
+
+        <!-- YES / NO labels -->
+        <text x="240" y="105" fill="#8b9bb8" font-size="12" font-family="monospace">YES</text>
+        <text x="450" y="105" fill="#8b9bb8" font-size="12" font-family="monospace">NO</text>
+        <text x="125" y="235" fill="#8b9bb8" font-size="11" font-family="monospace">YES</text>
+        <text x="225" y="235" fill="#8b9bb8" font-size="11" font-family="monospace">NO</text>
+        <text x="465" y="235" fill="#8b9bb8" font-size="11" font-family="monospace">YES</text>
+        <text x="565" y="235" fill="#8b9bb8" font-size="11" font-family="monospace">NO</text>
+
+        <!-- root: branch node -->
+        <g class="tree-node" data-tip="분기 노드: 질문만 한다. 예측 X. YES/NO에 따라 자식으로 내려간다."
+           style="color: #2dd4bf">
+          <rect x="265" y="20" width="170" height="40" rx="8" fill="#15203a" stroke="#2dd4bf" stroke-width="2"/>
+          <text x="350" y="45" text-anchor="middle" fill="#e6ecf5" font-size="14" font-weight="700">odor == "n" ?</text>
+        </g>
+
+        <!-- left child: branch -->
+        <g class="tree-node" data-tip="또 다른 분기. 왼쪽 그룹을 다시 두 그룹으로."
+           style="color: #2dd4bf">
+          <rect x="80" y="158" width="200" height="40" rx="8" fill="#15203a" stroke="#2dd4bf" stroke-width="2"/>
+          <text x="180" y="183" text-anchor="middle" fill="#e6ecf5" font-size="13" font-weight="600">spore == "r" ?</text>
+        </g>
+
+        <!-- right child: branch -->
+        <g class="tree-node" data-tip="오른쪽도 한 번 더 분기."
+           style="color: #2dd4bf">
+          <rect x="420" y="158" width="200" height="40" rx="8" fill="#15203a" stroke="#2dd4bf" stroke-width="2"/>
+          <text x="520" y="183" text-anchor="middle" fill="#e6ecf5" font-size="13" font-weight="600">stalk-root == "c" ?</text>
+        </g>
+
+        <!-- leaves -->
+        <g class="tree-node" data-tip="잎 노드: 예측 확정. 더 이상 안 묻는다." style="color: #fb7185">
+          <circle cx="100" cy="305" r="28" fill="#fb7185" opacity="0.2" stroke="#fb7185" stroke-width="2"/>
+          <text x="100" y="310" text-anchor="middle" fill="#fb7185" font-size="14" font-weight="800">독성</text>
+        </g>
+        <g class="tree-node" data-tip="잎 노드: 예측 확정." style="color: #2dd4bf">
+          <circle cx="260" cy="305" r="28" fill="#2dd4bf" opacity="0.2" stroke="#2dd4bf" stroke-width="2"/>
+          <text x="260" y="310" text-anchor="middle" fill="#2dd4bf" font-size="14" font-weight="800">식용</text>
+        </g>
+        <g class="tree-node" data-tip="잎 노드: 예측 확정." style="color: #2dd4bf">
+          <circle cx="440" cy="305" r="28" fill="#2dd4bf" opacity="0.2" stroke="#2dd4bf" stroke-width="2"/>
+          <text x="440" y="310" text-anchor="middle" fill="#2dd4bf" font-size="14" font-weight="800">식용</text>
+        </g>
+        <g class="tree-node" data-tip="잎 노드: 예측 확정." style="color: #fb7185">
+          <circle cx="600" cy="305" r="28" fill="#fb7185" opacity="0.2" stroke="#fb7185" stroke-width="2"/>
+          <text x="600" y="310" text-anchor="middle" fill="#fb7185" font-size="14" font-weight="800">독성</text>
+        </g>
+      </svg>
+      <div id="tree-tooltip"></div>
+    </div>
+
+    <div class="tree-points">
+      <div class="tree-point">
+        <div class="num">01</div>
+        <div class="body"><strong>질문</strong>으로 두 그룹을 분리</div>
+      </div>
+      <div class="tree-point">
+        <div class="num">02</div>
+        <div class="body">각 그룹에서 또 질문 = <strong>재귀</strong></div>
+      </div>
+      <div class="tree-point">
+        <div class="num">03</div>
+        <div class="body"><strong>예측은 잎 노드</strong>에서만 (분기 노드는 질문만)</div>
+      </div>
+    </div>
+  </div>
+  <span class="time-hint">⏱ 50s</span>
+</section>
+
+<!-- ④ GINI -->
+<section id="sec4" data-section="4">
+  <div class="section-num">SECTION 04 · CORE</div>
+  <h2 class="section-title">Gini 불순도 — 얼마나 섞였나?</h2>
+  <p class="section-sub">한 그룹에 식용/독성이 얼마나 섞여있나. <strong style="color:var(--teal)">0 = 순수</strong>, <strong style="color:var(--coral)">0.5 = 반반(최악)</strong>.</p>
+
+  <div class="gini-formula">
+    <span class="label">공식</span>
+    <code>Gini = 1 − Σ pᵢ²</code>
+  </div>
+
+  <div class="gini-grid">
+    <div class="gini-controls">
+      <div class="gini-counter edible">
+        <div>
+          <div class="label">🍄 식용</div>
+          <div style="color: var(--muted); font-size: 13px;">edible</div>
+        </div>
+        <div class="controls">
+          <button class="gini-btn" data-act="dec" data-target="edible">−</button>
+          <div class="gini-count" id="cnt-edible">5</div>
+          <button class="gini-btn" data-act="inc" data-target="edible">+</button>
+        </div>
+      </div>
+
+      <div class="gini-counter poison">
+        <div>
+          <div class="label">☠️ 독성</div>
+          <div style="color: var(--muted); font-size: 13px;">poisonous</div>
+        </div>
+        <div class="controls">
+          <button class="gini-btn" data-act="dec" data-target="poison">−</button>
+          <div class="gini-count" id="cnt-poison">5</div>
+          <button class="gini-btn" data-act="inc" data-target="poison">+</button>
+        </div>
+      </div>
+
+      <div class="gini-breakdown" id="gini-breakdown">
+        총 <span style="color:var(--text)">10</span>개 ·
+        식용 비율 <span class="calc-teal">0.500</span> ·
+        독성 비율 <span class="calc-coral">0.500</span>
+        <br>
+        1 − <span class="calc-teal">0.500²</span> − <span class="calc-coral">0.500²</span> = <strong style="color:var(--text)">0.500</strong>
+      </div>
+    </div>
+
+    <div class="gini-display">
+      <div class="gini-label">Gini 불순도</div>
+      <div class="gini-value" id="gini-value" style="color: var(--coral)">0.500</div>
+      <div class="gini-gauge">
+        <div class="gini-gauge-fill" id="gini-gauge-fill" style="width: 100%"></div>
+      </div>
+      <div class="gini-gauge-labels">
+        <span>0.0 순수</span>
+        <span>0.25</span>
+        <span>0.5 최악</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="best-split">
+    <strong>best_split</strong> — 모든 (특징 × 값) 조합을 시도해서 <strong>Gini를 가장 많이 줄이는</strong> 질문을 고른다. gain = 나누기 전 Gini − 나눈 후 Gini(가중평균).
+  </div>
+  <span class="time-hint">⏱ 80s</span>
+</section>
+
+<!-- ⑤ CODE -->
+<section id="sec5" data-section="5">
+  <div class="section-num">SECTION 05 · IMPLEMENTATION</div>
+  <h2 class="section-title">함수 6개로 완성</h2>
+  <p class="section-sub">외부 라이브러리 없이, 수업에서 배운 문법만으로.</p>
+
+  <div class="funcs">
+    <div class="func-card"><div class="name">gini()</div><div class="desc">한 그룹의 불순도 계산</div></div>
+    <div class="func-card"><div class="name">split()</div><div class="desc">(특징, 값)으로 데이터를 두 그룹으로</div></div>
+    <div class="func-card"><div class="name">best_split()</div><div class="desc">gain 최대인 (특징, 값) 찾기</div></div>
+    <div class="func-card"><div class="name">build_tree()</div><div class="desc">재귀로 트리 만들기</div></div>
+    <div class="func-card"><div class="name">predict()</div><div class="desc">뿌리부터 잎까지 따라 내려가서 예측</div></div>
+    <div class="func-card"><div class="name">print_tree()</div><div class="desc">트리 구조 출력</div></div>
+  </div>
+
+  <div class="code-block">
+<span class="kw">def</span> <span class="fn">gini</span>(data):
+    counts = {}
+    <span class="kw">for</span> sample <span class="kw">in</span> data:
+        lab = sample[<span class="str">"label"</span>]
+        counts[lab] = counts.get(lab, <span class="num">0</span>) + <span class="num">1</span>
+    total = <span class="fn">len</span>(data)
+    impurity = <span class="num">1.0</span>
+    <span class="kw">for</span> lab <span class="kw">in</span> counts:
+        p = counts[lab] / total                  <span class="com"># 각 라벨 비율</span>
+        impurity = impurity - p * p              <span class="com"># 1 - Σp² 누적</span>
+    <span class="kw">return</span> impurity
+  </div>
+
+  <div class="import-badge">import: 없음 ✓ (urllib만 표준 라이브러리)</div>
+  <span class="time-hint">⏱ 50s</span>
+</section>
+
+<!-- ⑥ DATA -->
+<section id="sec6" data-section="6">
+  <div class="section-num">SECTION 06 · DATASET</div>
+  <h2 class="section-title">데이터: 버섯 독성 분류</h2>
+  <p class="section-sub">UCI Mushroom — 모양·냄새·색깔로 식용/독성을 가른다.</p>
+
+  <div class="data-grid">
+    <div class="big-stat"><div class="num">8,124</div><div class="label">전체 샘플</div></div>
+    <div class="big-stat"><div class="num">22</div><div class="label">특징 (모두 범주형)</div></div>
+    <div class="big-stat teal"><div class="num">51.8%</div><div class="label">식용 (e)</div></div>
+    <div class="big-stat coral"><div class="num">48.2%</div><div class="label">독성 (p)</div></div>
+  </div>
+
+  <div class="data-bottom">
+    <div class="data-notes">
+      <li>결측치 없음 — 즉시 학습 가능</li>
+      <li>전부 범주형(문자형) 값 → <code>==</code> 비교만으로 분기 가능</li>
+      <li>식용/독성 비율이 거의 1:1 → 클래스 불균형 문제 없음</li>
+      <li>train : test = 7 : 3 ( i % 10 &lt; 7 이면 train )</li>
+    </div>
+    <div class="donut-wrap">
+      <canvas id="donut-chart"></canvas>
+    </div>
+  </div>
+  <span class="time-hint">⏱ 40s</span>
+</section>
+
+<!-- ⑦ RESULTS -->
+<section id="sec7" data-section="7">
+  <div class="section-num">SECTION 07 · RESULTS</div>
+  <h2 class="section-title">냄새 하나로 거의 갈린다</h2>
+  <p class="section-sub">알고리즘이 22개 특징 중 <strong style="color:var(--yellow)">odor</strong>를 첫 질문으로 선택.</p>
+
+  <div class="results-hero">
+    🥇 첫 분기: <strong>odor == "n"</strong> (냄새가 없는가?) · gain <span class="gain-num">0.31</span> — 데이터가 직접 고른 결과
+  </div>
+
+  <div class="results-grid">
+    <div class="chart-wrap">
+      <canvas id="acc-chart"></canvas>
+    </div>
+    <div class="tree-mini">
+      <div class="head">📐 깊이 2 트리 구조</div>
+[<span class="q">odor == "n" ?</span>]
+ ├─ YES → [<span class="q">spore == "r"?</span>]
+ │         ├─ YES <span class="arr">→</span> <span class="p">독성</span>
+ │         └─ NO  <span class="arr">→</span> <span class="e">식용</span>
+ └─ NO  → [<span class="q">stalk-root == "c"?</span>]
+           ├─ YES <span class="arr">→</span> <span class="e">식용</span>
+           └─ NO  <span class="arr">→</span> <span class="p">독성</span>
+
+<span style="font-family: -apple-system, sans-serif; font-size:13px; color:var(--muted); display:block; margin-top:14px; line-height:1.6;">
+깊이 2만으로 test 정확도 <strong style="color:var(--teal)">95.9%</strong> · 깊이 5에서 <strong style="color:var(--teal)">99.8%</strong>
+</span>
+    </div>
+  </div>
+  <span class="time-hint">⏱ 80s</span>
+</section>
+
+<!-- ⑧ LIMITS -->
+<section id="sec8" data-section="8">
+  <div class="section-num">SECTION 08 · LIMITS &amp; WRAP-UP</div>
+  <h2 class="section-title">한계 · 그리고 정리</h2>
+  <p class="section-sub">의사결정트리도 만능은 아니다.</p>
+
+  <div class="overfit-box">
+    <div class="title">⚠️ 과적합 (Overfitting)</div>
+    깊이를 무한히 늘리면 train은 100%지만 보통 데이터는 test가 꺾인다 (외우기 시작).
+    <strong>버섯 데이터는 특징과 독성의 연관이 워낙 강하고 깨끗</strong>해서, 깊이 5에서도 test 99.8% 유지 →
+    과적합이 약하게만 나타남. <strong style="color:var(--yellow)">"우리 데이터가 운이 좋은 케이스"</strong>임을 인지.
+  </div>
+
+  <div class="limit-cards">
+    <div class="limit-card">
+      <div class="head">📐 연속형 처리 부족</div>
+      <div class="body">우리 구현은 <code>==</code> 비교만 지원 (범주형 전용). 키·몸무게 같은 연속형은 <code>&lt;=</code> 분기로 확장 필요.</div>
+    </div>
+    <div class="limit-card">
+      <div class="head">🌀 불안정성</div>
+      <div class="body">학습 데이터를 조금만 바꿔도 트리 구조가 크게 변함. → 실무는 여러 트리를 평균(Random Forest)으로 보완.</div>
+    </div>
+    <div class="limit-card">
+      <div class="head">👀 욕심쟁이(Greedy)</div>
+      <div class="body">매 분기마다 그 시점의 최선만 봄. 전체 관점에서 더 좋은 트리는 보장 X.</div>
+    </div>
+  </div>
+
+  <div class="closing">
+    사람이 손으로 짜던 <span class="ac">if문</span>을, 데이터가 <span class="ac">자동으로 학습</span>하는 모델.
+  </div>
+  <span class="time-hint">⏱ 60s · 끝 🎉</span>
+</section>
+
+</main>
+
+<script>
+// ============== Sidebar nav: click + active highlight ==============
+const navItems = document.querySelectorAll('.nav-item');
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const target = document.getElementById(item.dataset.target);
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+const sections = [...document.querySelectorAll('section[data-section]')];
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && e.intersectionRatio > 0.5) {
+      const id = e.target.id;
+      navItems.forEach(n => n.classList.toggle('active', n.dataset.target === id));
+    }
+  });
+}, { threshold: [0.5, 0.6] });
+sections.forEach(s => obs.observe(s));
+
+// ============== Keyboard nav ==============
+document.addEventListener('keydown', (e) => {
+  if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+  const scrollY = window.scrollY;
+  let currentIdx = 0;
+  for (let i = 0; i < sections.length; i++) {
+    if (sections[i].offsetTop <= scrollY + window.innerHeight * 0.4) currentIdx = i;
+  }
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+    e.preventDefault();
+    if (currentIdx < sections.length - 1) sections[currentIdx + 1].scrollIntoView({ behavior: 'smooth' });
+  } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+    e.preventDefault();
+    if (currentIdx > 0) sections[currentIdx - 1].scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+// ============== Tree node tooltip (Section 3) ==============
+const tooltip = document.getElementById('tree-tooltip');
+const treeWrap = document.querySelector('.tree-svg-wrap');
+document.querySelectorAll('.tree-node').forEach(node => {
+  node.addEventListener('mouseenter', (e) => {
+    tooltip.textContent = node.dataset.tip || '';
+    tooltip.style.opacity = '1';
+  });
+  node.addEventListener('mousemove', (e) => {
+    const rect = treeWrap.getBoundingClientRect();
+    tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
+    tooltip.style.top = (e.clientY - rect.top + 12) + 'px';
+  });
+  node.addEventListener('mouseleave', () => {
+    tooltip.style.opacity = '0';
+  });
+});
+
+// ============== Gini calculator (Section 4) ==============
+let counts = { edible: 5, poison: 5 };
+
+function updateGini() {
+  const e = counts.edible;
+  const p = counts.poison;
+  const total = e + p;
+  const cntE = document.getElementById('cnt-edible');
+  const cntP = document.getElementById('cnt-poison');
+  const valEl = document.getElementById('gini-value');
+  const fill = document.getElementById('gini-gauge-fill');
+  const bk = document.getElementById('gini-breakdown');
+
+  cntE.textContent = e;
+  cntP.textContent = p;
+
+  let gini;
+  if (total === 0) {
+    gini = 0;
+    bk.innerHTML = '데이터가 없습니다.';
+  } else {
+    const pe = e / total;
+    const pp = p / total;
+    gini = 1 - pe * pe - pp * pp;
+    bk.innerHTML =
+      `총 <span style="color:var(--text)">${total}</span>개 · ` +
+      `식용 비율 <span class="calc-teal">${pe.toFixed(3)}</span> · ` +
+      `독성 비율 <span class="calc-coral">${pp.toFixed(3)}</span><br>` +
+      `1 − <span class="calc-teal">${pe.toFixed(3)}²</span> − <span class="calc-coral">${pp.toFixed(3)}²</span> = ` +
+      `<strong style="color:var(--text)">${gini.toFixed(3)}</strong>`;
+  }
+
+  valEl.textContent = gini.toFixed(3);
+  // color interpolation: teal (0) → yellow (0.25) → coral (0.5)
+  let color;
+  if (gini < 0.25) color = 'var(--teal)';
+  else if (gini < 0.42) color = 'var(--yellow)';
+  else color = 'var(--coral)';
+  valEl.style.color = color;
+  fill.style.width = Math.min(100, (gini / 0.5) * 100) + '%';
+}
+
+document.querySelectorAll('.gini-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const t = btn.dataset.target;
+    const act = btn.dataset.act;
+    if (act === 'inc') counts[t]++;
+    else if (act === 'dec' && counts[t] > 0) counts[t]--;
+    updateGini();
+  });
+});
+updateGini();
+
+// ============== Section 6: Donut chart ==============
+new Chart(document.getElementById('donut-chart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['식용 (e)', '독성 (p)'],
+    datasets: [{
+      data: [4208, 3916],
+      backgroundColor: ['#2dd4bf', '#fb7185'],
+      borderColor: '#15203a',
+      borderWidth: 3
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#e6ecf5', font: { size: 13 }, padding: 14 }
+      },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `${ctx.label}: ${ctx.raw.toLocaleString()}개`
+        }
+      }
+    }
+  }
+});
+
+// ============== Section 7: Accuracy line chart ==============
+new Chart(document.getElementById('acc-chart'), {
+  type: 'line',
+  data: {
+    labels: ['1', '2', '3', '5'],
+    datasets: [
+      {
+        label: 'train',
+        data: [0.888, 0.952, 0.985, 1.000],
+        borderColor: '#2dd4bf',
+        backgroundColor: 'rgba(45, 212, 191, 0.15)',
+        tension: 0.3,
+        pointRadius: 7,
+        pointHoverRadius: 10,
+        borderWidth: 3,
+        fill: true
+      },
+      {
+        label: 'test',
+        data: [0.885, 0.959, 0.985, 0.998],
+        borderColor: '#fb7185',
+        backgroundColor: 'rgba(251, 113, 133, 0.15)',
+        tension: 0.3,
+        pointRadius: 7,
+        pointHoverRadius: 10,
+        borderWidth: 3,
+        fill: true
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        min: 0.85,
+        max: 1.01,
+        ticks: { color: '#8b9bb8', callback: (v) => v.toFixed(2) },
+        grid: { color: '#25324f' },
+        title: { display: true, text: 'accuracy', color: '#8b9bb8' }
+      },
+      x: {
+        ticks: { color: '#8b9bb8', font: { family: 'monospace', size: 14 } },
+        grid: { color: '#25324f' },
+        title: { display: true, text: 'max_depth', color: '#8b9bb8' }
+      }
+    },
+    plugins: {
+      legend: { labels: { color: '#e6ecf5', font: { size: 14 }, padding: 16 } },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `${ctx.dataset.label}: ${(ctx.raw * 100).toFixed(1)}%`
+        }
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
