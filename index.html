@@ -652,6 +652,14 @@
     gap: 6px;
     justify-content: center;
   }
+  .feat-card.overfit {
+    border-left-color: var(--coral);
+    background: linear-gradient(90deg, rgba(251,113,133,0.08), var(--panel) 30%);
+  }
+  .feat-card.overfit .feat-num {
+    font-size: 30px;
+    line-height: 1;
+  }
   .feat-card.tag .feat-title { color: var(--teal); }
   .feat-card.tag .pill {
     background: var(--teal-soft);
@@ -1496,16 +1504,15 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
       </div>
     </div>
 
-    <div class="feat-card tag">
-      <div class="feat-title">🔤 인코딩 없음</div>
-      <span class="pill">odor == "n"</span>
-      <div class="feat-desc">문자를 숫자로 바꾸지 않고 <strong style="color:var(--text)">문자 그대로 == 비교</strong></div>
-    </div>
-
-    <div class="feat-card tag">
-      <div class="feat-title">⚡ 계산 시간</div>
-      <span class="pill">&lt; 1초</span>
-      <div class="feat-desc">완전탐색이지만 <code>set</code> 으로 중복 값 제거 → <strong style="color:var(--text)">8,124개 1초 미만</strong></div>
+    <div class="feat-card overfit" style="grid-column: span 2;">
+      <div class="feat-num" style="color: var(--coral);">⚠️</div>
+      <div class="feat-body">
+        <div class="feat-title" style="color: var(--coral);">과적합 (OVERFITTING)</div>
+        <div class="feat-desc">
+          트리가 <strong style="color:var(--text)">너무 깊어져</strong> 훈련 데이터의 <strong style="color:var(--text)">세부적인 특징이나 예외까지 학습</strong>하는 현상
+        </div>
+        <div class="feat-sub">→ train에선 100% 가까이 맞히지만, 처음 보는 test 데이터에선 성능이 떨어질 수 있다</div>
+      </div>
     </div>
   </div>
 
