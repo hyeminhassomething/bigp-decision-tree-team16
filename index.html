@@ -581,19 +581,19 @@
   .wrap-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 12px;
+    margin-bottom: 16px;
   }
   .mini-stat {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 10px 14px;
+    padding: 14px 16px;
     text-align: center;
   }
   .mini-stat .num {
     font-family: monospace;
-    font-size: 26px;
+    font-size: 30px;
     font-weight: 900;
     line-height: 1.1;
   }
@@ -604,19 +604,19 @@
   /* Highlighted "직접 구현" feature card */
   .feat-row {
     display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
+    grid-template-columns: 1.4fr 2fr;
+    gap: 14px;
+    margin-bottom: 16px;
   }
   .feat-card {
     background: var(--panel);
     border: 1px solid var(--border);
     border-left: 4px solid var(--yellow);
     border-radius: 12px;
-    padding: 10px 14px;
+    padding: 14px 18px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
   }
   .feat-card .feat-num {
     font-family: monospace;
@@ -653,12 +653,47 @@
     justify-content: center;
   }
   .feat-card.overfit {
-    border-left-color: var(--coral);
-    background: linear-gradient(90deg, rgba(251,113,133,0.08), var(--panel) 30%);
+    border: 2px solid var(--coral);
+    border-left-width: 6px;
+    background:
+      linear-gradient(90deg, rgba(251,113,133,0.18), rgba(251,113,133,0.04) 60%, var(--panel));
+    box-shadow: 0 0 0 1px rgba(251,113,133,0.25), 0 10px 30px rgba(251,113,133,0.18);
+    padding: 16px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .feat-card.overfit::before {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 180px;
+    height: 100%;
+    background: radial-gradient(circle at 90% 50%, rgba(251,113,133,0.22), transparent 70%);
+    pointer-events: none;
   }
   .feat-card.overfit .feat-num {
-    font-size: 30px;
+    font-size: 44px;
     line-height: 1;
+    animation: overfitpulse 2.4s ease-in-out infinite;
+  }
+  .feat-card.overfit .feat-title {
+    font-size: 14px !important;
+    letter-spacing: 0.08em;
+  }
+  .feat-card.overfit .feat-desc {
+    font-size: 14.5px;
+    line-height: 1.55;
+    margin-top: 2px;
+  }
+  .feat-card.overfit .feat-sub {
+    color: var(--coral);
+    opacity: 0.9;
+    font-size: 12px;
+    margin-top: 6px;
+  }
+  @keyframes overfitpulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(251,113,133,0.4)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 14px rgba(251,113,133,0.8)); }
   }
   .feat-card.tag .feat-title { color: var(--teal); }
   .feat-card.tag .pill {
@@ -776,16 +811,16 @@
   .result-row {
     display: grid;
     grid-template-columns: 1.4fr 1fr;
-    gap: 16px;
-    margin-bottom: 12px;
+    gap: 20px;
+    margin-bottom: 16px;
     align-items: start;
   }
   .chart-wrap {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 12px;
-    height: 230px;
+    padding: 16px;
+    height: 260px;
   }
   .result-hero {
     background: var(--panel);
@@ -1504,7 +1539,7 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
       </div>
     </div>
 
-    <div class="feat-card overfit" style="grid-column: span 2;">
+    <div class="feat-card overfit">
       <div class="feat-num" style="color: var(--coral);">⚠️</div>
       <div class="feat-body">
         <div class="feat-title" style="color: var(--coral);">과적합 (OVERFITTING)</div>
@@ -1549,21 +1584,6 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
           클래스가 <strong>51.8 : 48.2</strong>로 균형 잡혀 있어 <strong>정확도가 신뢰할 수 있는 지표</strong>.
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="limit-cards">
-    <div class="limit-card warn">
-      <div class="head">⚠️ 과적합 (Overfitting)</div>
-      <div class="body">깊이↑ → train 100%. 보통은 test가 꺾이는데, <strong style="color:var(--text)">버섯 데이터가 워낙 깨끗</strong>해서 test도 99.8% 유지. → 운 좋은 케이스임을 인지.</div>
-    </div>
-    <div class="limit-card">
-      <div class="head">📐 연속형 처리 부족</div>
-      <div class="body">우리 구현은 <code>==</code> 비교만 지원 (범주형 전용). 키·몸무게 같은 연속형은 <code>&lt;=</code> 분기로 확장 필요.</div>
-    </div>
-    <div class="limit-card">
-      <div class="head">🌀 불안정성 + 욕심</div>
-      <div class="body">데이터 조금만 바뀌어도 트리 구조 크게 변함. 매 분기 그 시점의 최선만 봄(greedy). → 실무는 Random Forest로 보완.</div>
     </div>
   </div>
 
