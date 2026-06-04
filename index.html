@@ -799,14 +799,14 @@
   /* best_split timing caption */
   .cc-cap {
     font-family: -apple-system, sans-serif;
-    font-size: 10.5px;
+    font-size: 12px;
     color: var(--yellow);
-    margin-top: 6px;
-    padding-top: 5px;
+    margin-top: 8px;
+    padding-top: 6px;
     border-top: 1px dashed var(--border);
-    line-height: 1.45;
+    line-height: 1.5;
   }
-  .cc-cap .ic { font-size: 11px; margin-right: 3px; }
+  .cc-cap .ic { font-size: 12.5px; margin-right: 3px; }
 
   .result-row {
     display: grid;
@@ -896,8 +896,8 @@
   .stage {
     position: relative;
     width: 100%;
-    aspect-ratio: 17 / 9;
-    max-height: 78vh;
+    aspect-ratio: 17 / 9.6;
+    max-height: 80vh;
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 14px;
@@ -947,7 +947,7 @@
     backdrop-filter: blur(4px);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 10px 14px 12px;
+    padding: 12px 16px 14px;
     font-family: monospace;
     color: var(--text);
     opacity: 0.22;
@@ -970,28 +970,28 @@
   }
   .codecard .cc-head {
     font-family: -apple-system, sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--teal);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     border-bottom: 1px dashed var(--border);
-    padding-bottom: 5px;
+    padding-bottom: 6px;
   }
   .codecard .cc-num {
     display: inline-block;
     background: var(--teal);
     color: var(--bg);
     border-radius: 999px;
-    width: 18px; height: 18px;
-    line-height: 18px;
+    width: 22px; height: 22px;
+    line-height: 22px;
     text-align: center;
     font-weight: 800;
-    margin-right: 4px;
-    font-size: 11px;
+    margin-right: 6px;
+    font-size: 13px;
   }
   .codecard pre {
-    font-size: 11.5px;
-    line-height: 1.55;
+    font-size: 12.5px;
+    line-height: 1.6;
     margin: 0;
     white-space: pre;
   }
@@ -1009,14 +1009,14 @@
   .codecard pre .ann {
     color: #5eead4;
     font-style: italic;
-    font-size: 10.5px;
+    font-size: 12px;
   }
 
   /* card positions (percent of stage) */
-  #card-gini    { top: 4%;  left: 1%;  width: 24%; }
-  #card-best    { top: 4%;  right: 1%; width: 26%; }
-  #card-build   { bottom: 4%; left: 1%; width: 26%; }
-  #card-predict { bottom: 4%; right: 1%; width: 27%; }
+  #card-gini    { top: 3%;  left: 1%;  width: 32%; }
+  #card-best    { top: 3%;  right: 1%; width: 32%; }
+  #card-build   { bottom: 6%; left: 1%; width: 32%; }
+  #card-predict { bottom: 6%; right: 1%; width: 32%; }
 
   /* step indicator */
   .step-indicator {
@@ -1449,13 +1449,13 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
     <!-- Card 1: gini() — top-left, beside root -->
     <div class="codecard" id="card-gini" data-step="1">
       <div class="cc-head"><span class="cc-num">①</span> gini() — 노드의 불순도</div>
-      <pre><span class="cl" data-line="g1"><span class="kw">def</span> <span class="fn">gini</span>(data):</span>          <span class="ann">데이터 묶음 → 불순도 한 숫자</span>
-<span class="cl" data-line="g2">    counts = {}</span>          <span class="ann">라벨별 개수 셀 통</span>
-<span class="cl" data-line="g3">    <span class="kw">for</span> s <span class="kw">in</span> data:</span>      <span class="ann">샘플 순회</span>
+      <pre><span class="cl" data-line="g1"><span class="kw">def</span> <span class="fn">gini</span>(data):</span>       <span class="ann">→ 불순도 한 숫자</span>
+<span class="cl" data-line="g2">    counts = {}</span>        <span class="ann">라벨 카운트</span>
+<span class="cl" data-line="g3">    <span class="kw">for</span> s <span class="kw">in</span> data:</span>   <span class="ann">샘플 순회</span>
 <span class="cl" data-line="g4">        counts[s[<span class="st">"label"</span>]] += <span class="nm">1</span></span>
-<span class="cl" data-line="g5">    p = <span class="nm">1.0</span></span>            <span class="ann">1 − Σp² 시작</span>
+<span class="cl" data-line="g5">    p = <span class="nm">1.0</span></span>          <span class="ann">1 − Σp²</span>
 <span class="cl" data-line="g6">    <span class="kw">for</span> lab <span class="kw">in</span> counts:</span>
-<span class="cl glow" data-line="g7">        p -= (counts[lab]/n)**<span class="nm">2</span></span>  <span class="ann">↗ 트리 모든 'gini=' 숫자</span>
+<span class="cl glow" data-line="g7">        p -= (counts[lab]/n)**<span class="nm">2</span></span>  <span class="ann">↗ 'gini='</span>
 <span class="cl" data-line="g8">    <span class="kw">return</span> p</span></pre>
     </div>
 
@@ -1476,14 +1476,14 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
     <!-- Card 3: build_tree() — middle-left, between branches -->
     <div class="codecard" id="card-build" data-step="3">
       <div class="cc-head"><span class="cc-num">③</span> build_tree() — 재귀로 트리 짓기</div>
-      <pre><span class="cl" data-line="t1"><span class="kw">def</span> <span class="fn">build_tree</span>(data, d, max_d):</span>
-<span class="cl" data-line="t2">  <span class="kw">if</span> <span class="fn">gini</span>(data)==<span class="nm">0</span> <span class="kw">or</span> d>=max_d:</span>
-<span class="cl glow" data-line="t3">    node.prediction = majority(data)</span>  <span class="ann">↗ 잎 4개</span>
+      <pre><span class="cl" data-line="t1"><span class="kw">def</span> <span class="fn">build_tree</span>(data, d, mx):</span>
+<span class="cl" data-line="t2">  <span class="kw">if</span> <span class="fn">gini</span>(data)==<span class="nm">0</span> <span class="kw">or</span> d>=mx:</span>
+<span class="cl glow" data-line="t3">    node.prediction = majority(data)</span> <span class="ann">↗ 잎</span>
 <span class="cl" data-line="t4">    <span class="kw">return</span> node</span>
 <span class="cl" data-line="t5">  f, v, _ = <span class="fn">best_split</span>(data)</span>
-<span class="cl glow" data-line="t6">  node.left  = <span class="fn">build_tree</span>(L, d+<span class="nm">1</span>, ...)</span>  <span class="ann">↗ YES 가지</span>
-<span class="cl glow" data-line="t7">  node.right = <span class="fn">build_tree</span>(R, d+<span class="nm">1</span>, ...)</span>  <span class="ann">↗ NO 가지</span>
-<span class="cl" data-line="t8">  <span class="kw">return</span> node</span>           <span class="ann">분기 노드 3개 완성</span></pre>
+<span class="cl glow" data-line="t6">  node.left  = <span class="fn">build_tree</span>(L,d+<span class="nm">1</span>)</span>  <span class="ann">↗ YES</span>
+<span class="cl glow" data-line="t7">  node.right = <span class="fn">build_tree</span>(R,d+<span class="nm">1</span>)</span>  <span class="ann">↗ NO</span>
+<span class="cl" data-line="t8">  <span class="kw">return</span> node</span>          <span class="ann">내부 노드 3개</span></pre>
     </div>
 
     <!-- Card 4: predict() — bottom-right, beside leaf path -->
@@ -1491,12 +1491,12 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
       <div class="cc-head"><span class="cc-num">④</span> predict() — 잎까지 따라 내려가기</div>
       <pre><span class="cl" data-line="p1"><span class="kw">def</span> <span class="fn">predict</span>(node, sample):</span>
 <span class="cl" data-line="p2">  <span class="kw">if</span> node.prediction <span class="kw">is</span> <span class="kw">not</span> <span class="nm">None</span>:</span>
-<span class="cl glow" data-line="p3">    <span class="kw">return</span> node.prediction</span>   <span class="ann">↗ 잎 도착, 예측 반환</span>
+<span class="cl glow" data-line="p3">    <span class="kw">return</span> node.prediction</span>  <span class="ann">↗ 잎 도착</span>
 <span class="cl" data-line="p4">  v = sample[node.feature]</span>
 <span class="cl" data-line="p5">  <span class="kw">if</span> v == node.value:</span>
-<span class="cl" data-line="p6">    <span class="kw">return</span> <span class="fn">predict</span>(node.left, s)</span>   <span class="ann">YES 따라가기</span>
+<span class="cl" data-line="p6">    <span class="kw">return</span> <span class="fn">predict</span>(node.left, s)</span>  <span class="ann">YES</span>
 <span class="cl" data-line="p7">  <span class="kw">else</span>:</span>
-<span class="cl" data-line="p8">    <span class="kw">return</span> <span class="fn">predict</span>(node.right, s)</span>  <span class="ann">NO 따라가기</span></pre>
+<span class="cl" data-line="p8">    <span class="kw">return</span> <span class="fn">predict</span>(node.right, s)</span>  <span class="ann">NO</span></pre>
     </div>
 
     <!-- Step indicator -->
@@ -1530,7 +1530,7 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
       <div class="feat-body">
         <div class="feat-title">TRAIN / TEST 분리 · 직접 구현</div>
         <div class="feat-desc"><code>i % 10</code> 으로 직접 분리 — <strong style="color:var(--text)">라이브러리 없이, 재현 가능</strong></div>
-        <div class="feat-sub">train 정확도와 test 정확도를 따로 측정 (오른쪽 차트 참고)</div>
+        <div class="feat-sub">train 정확도와 test 정확도를 따로 측정</div>
       </div>
     </div>
 
@@ -1583,7 +1583,7 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
   </div>
 
   <div class="closing">
-    사람이 손으로 짜던 <span class="ac">if문</span>을, 데이터가 <span class="ac">자동으로 학습</span>하는 모델.
+    사람의 <span class="ac">if문</span>을 데이터가 <span class="ac">스스로 만든다</span>
   </div>
   <span class="time-hint">⏱ 끝 🎉</span>
 </section>
