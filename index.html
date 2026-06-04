@@ -1225,16 +1225,19 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
         <text x="565" y="235" fill="#8b9bb8" font-size="11" font-family="monospace">NO</text>
 
         <g class="tree-node" data-tip="자식 노드: 질문만 한다. 예측 X. YES/NO에 따라 자식으로 내려간다." style="color: #2dd4bf">
-          <rect x="265" y="20" width="170" height="40" rx="8" fill="#15203a" stroke="#2dd4bf" stroke-width="2"/>
-          <text x="350" y="45" text-anchor="middle" fill="#e6ecf5" font-size="14" font-weight="700">odor == "n" ?</text>
+          <rect x="255" y="14" width="190" height="56" rx="8" fill="#15203a" stroke="#2dd4bf" stroke-width="2"/>
+          <text x="350" y="36" text-anchor="middle" fill="#e6ecf5" font-size="14" font-weight="700">odor == "n" ?</text>
+          <text x="350" y="56" text-anchor="middle" fill="#8b9bb8" font-size="11">냄새가 없는가?</text>
         </g>
         <g class="tree-node" data-tip="또 다른 분기. 왼쪽 그룹을 다시 두 그룹으로." style="color: #2dd4bf">
-          <rect x="80" y="158" width="200" height="40" rx="8" fill="#15203a" stroke="#2dd4bf" stroke-width="2"/>
-          <text x="180" y="183" text-anchor="middle" fill="#e6ecf5" font-size="13" font-weight="600">spore == "r" ?</text>
+          <rect x="70" y="152" width="220" height="56" rx="8" fill="#15203a" stroke="#2dd4bf" stroke-width="2"/>
+          <text x="180" y="174" text-anchor="middle" fill="#e6ecf5" font-size="13" font-weight="600">spore == "r" ?</text>
+          <text x="180" y="194" text-anchor="middle" fill="#8b9bb8" font-size="11">포자색이 초록인가?</text>
         </g>
         <g class="tree-node" data-tip="오른쪽도 한 번 더 분기." style="color: #2dd4bf">
-          <rect x="420" y="158" width="200" height="40" rx="8" fill="#15203a" stroke="#2dd4bf" stroke-width="2"/>
-          <text x="520" y="183" text-anchor="middle" fill="#e6ecf5" font-size="13" font-weight="600">stalk-root == "c" ?</text>
+          <rect x="410" y="152" width="220" height="56" rx="8" fill="#15203a" stroke="#2dd4bf" stroke-width="2"/>
+          <text x="520" y="174" text-anchor="middle" fill="#e6ecf5" font-size="13" font-weight="600">stalk-root == "c" ?</text>
+          <text x="520" y="194" text-anchor="middle" fill="#8b9bb8" font-size="11">대 뿌리가 곤봉형인가?</text>
         </g>
         <g class="tree-node" data-tip="잎 노드: 예측 확정. 더 이상 안 묻는다." style="color: #fb7185">
           <circle cx="100" cy="305" r="28" fill="#fb7185" opacity="0.2" stroke="#fb7185" stroke-width="2"/>
@@ -1326,17 +1329,9 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
       <div class="gini-gauge">
         <div class="gini-gauge-fill" id="gini-gauge-fill" style="width: 100%"></div>
       </div>
-      <div class="gini-gauge-labels">
-        <span>0.0 순수</span>
-        <span>0.25</span>
-        <span>0.5 최악</span>
-      </div>
     </div>
   </div>
 
-  <div class="best-split">
-    <strong>best_split</strong> — 모든 (특징 × 값) 조합을 시도해서 <strong>Gini를 가장 많이 줄이는</strong> 질문을 고른다. gain = 나누기 전 Gini − 나눈 후 Gini(가중평균).
-  </div>
   <span class="time-hint">⏱ 80s</span>
 </section>
 
@@ -1472,8 +1467,8 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
 <span class="cl" data-line="b3">      <span class="kw">for</span> v <span class="kw">in</span> values(f):</span>
 <span class="cl" data-line="b4">        L, R = <span class="fn">split</span>(data, f, v)</span>
 <span class="cl" data-line="b5">        gain = base − weighted</span> <span class="ann">불순도 감소량</span>
-<span class="cl glow" data-line="b6">        <span class="kw">if</span> gain > best:</span>      <span class="ann">↗ 노드의 질문 텍스트</span>
-<span class="cl glow" data-line="b7">            best = (f, v)</span>      <span class="ann">↗ 루트엔 odor=="n" 선택</span>
+<span class="cl glow" data-line="b6">        <span class="kw">if</span> gain > best:</span>
+<span class="cl glow" data-line="b7">            best = (f, v)</span>  <span class="ann">↗ 루트: odor=="n"</span>
 <span class="cl" data-line="b8">    <span class="kw">return</span> best</span></pre>
       <div class="cc-cap"><span class="ic">⚡</span>완전탐색이지만 <code>set</code> 으로 중복 값 제거 → 8,124개 1초 미만</div>
     </div>
