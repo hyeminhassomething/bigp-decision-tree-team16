@@ -1205,7 +1205,7 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
 <section id="sec3" data-section="3">
   <div class="section-num">SECTION 03 · PRINCIPLE</div>
   <h2 class="section-title">트리 = 분기 + 재귀</h2>
-  <p class="section-sub">자식 노드와 잎 노드의 차이가 핵심입니다.</p>
+  <p class="section-sub">내부 노드와 잎 노드의 차이가 핵심입니다.</p>
 
   <div class="tree-wrap">
     <div class="tree-svg-wrap">
@@ -1224,7 +1224,7 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
         <text x="465" y="235" fill="#8b9bb8" font-size="11" font-family="monospace">YES</text>
         <text x="565" y="235" fill="#8b9bb8" font-size="11" font-family="monospace">NO</text>
 
-        <g class="tree-node" data-tip="자식 노드: 질문만 한다. 예측 X. YES/NO에 따라 자식으로 내려간다." style="color: #2dd4bf">
+        <g class="tree-node" data-tip="내부 노드: 질문만 한다. 예측 X. YES/NO에 따라 자식으로 내려간다." style="color: #2dd4bf">
           <rect x="255" y="14" width="190" height="56" rx="8" fill="#15203a" stroke="#2dd4bf" stroke-width="2"/>
           <text x="350" y="36" text-anchor="middle" fill="#e6ecf5" font-size="14" font-weight="700">odor == "n" ?</text>
           <text x="350" y="56" text-anchor="middle" fill="#8b9bb8" font-size="11">냄새가 없는가?</text>
@@ -1270,7 +1270,7 @@ tree = <span style="color:#2dd4bf">build_tree</span>(data, max_depth=5)
       </div>
       <div class="tree-point">
         <div class="num">03</div>
-        <div class="body"><strong>예측은 잎 노드</strong>에서만 (자식 노드는 질문만)</div>
+        <div class="body"><strong>예측은 잎 노드</strong>에서만 (내부 노드는 질문만)</div>
       </div>
     </div>
   </div>
